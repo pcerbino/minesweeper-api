@@ -17,3 +17,7 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+Route::post('game', 'ApiController@create');
+Route::get('game/{id}', 'GameController@show');
+Route::put('game/{gameId}/move', 'ApiController@move');

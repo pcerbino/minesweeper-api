@@ -10,8 +10,7 @@ class Game extends Model
     
     protected $attributes = [
         'status' => 'new',
-        'result' => 'not_finish',
-        'started_at' => date()
+        'result' => 'not_finish'
     ];
 
     public function user()
