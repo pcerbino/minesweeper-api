@@ -1,12 +1,21 @@
 <?php
 
-namespace App\Http\Controllers\API;
+namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
+use App\Game\Game;
+
 class GameController extends Controller
 {
+
+    protected $game;
+
+    public function __construct(Game $game)
+    {
+        $this->game = $game;
+    }
 
     /**
      * 
@@ -16,7 +25,9 @@ class GameController extends Controller
      */
     public function create(Request $request)
     {
-        //
+        $board = $this->game->start(20, 20, 5);
+
+        var_dump( json_encode($board, JSON_FORCE_OBJECT));
     }
 
     /**

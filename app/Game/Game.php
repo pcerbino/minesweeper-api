@@ -3,7 +3,7 @@ namespace App\Game;
 
 use App\Enums\MoveType;
 use App\Enums\GameStatusType;
-use Board;
+use App\Game\Board;
 
 class Game {
 
@@ -53,21 +53,23 @@ class Game {
     public $endedAt;
 
 
-    public function __construct($game = null){
-        if($game){
-            // Set vars
-        }
+    public function __construct(Board $board){
+
+        $this->board = $board;
     }
 
-    public function start(integer $qMines, integer $qRows, integer $qCols) : Board {
+    public function start(int $rows, int $cols, int $mines) : Board {
 
         // Create new board with size and mines
+        $this->board->create($rows, $cols, $mines);
 
         // Set NEW status
 
         // Create new record on DB
         
         // Return board
+
+        return $this->board;
     }
 
     public function makeMove($position, $moveType) : MoveResult {
@@ -78,6 +80,9 @@ class Game {
 
             // FLAG
                 // Board > putFlag
+
+            // QUESTION MARK
+                // Board > putQuestionMark
 
             // Display
                 // Board > display
