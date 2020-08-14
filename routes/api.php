@@ -19,5 +19,5 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 Route::post('game', 'GameController@create');
-Route::get('game/{id}', 'GameController@show');
-Route::put('game/{gameId}/move', 'GameController@move');
+Route::put('game/{gameId}/setSquare', 'GameController@setSquare');
+Route::put('game/{gameId}/setFlag', 'GameController@setFlag');

@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-
+use App\Enums\MoveType;
 use App\Game\Game;
 
 class GameController extends Controller
@@ -12,55 +12,53 @@ class GameController extends Controller
 
     protected $game;
 
+
     public function __construct(Game $game)
     {
         $this->game = $game;
     }
 
-    /**
-     * 
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
+
     public function create(Request $request)
     {
-        $board = $this->game->start(20, 20, 5);
 
-        var_dump( json_encode($board, JSON_FORCE_OBJECT));
+        // TODO VALIDATION
+
+        $this->game->start(15, 15, 15);
+
+        return response()->json(["gameId" => $this->game->id, "board" => $this->game->board->board]);
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
+
+    public function setSquare(Request $request, $gameId)
     {
-        //
+        // TODO VALIDATION
+
+        // TODO VALIDATION
+
+        $x = $request->get('x');
+        $y = $request->get('y');
+
+        $this->game->set($gameId);
+
+        $this->game->play($x, $y, MoveType::fromValue(MoveType::Show));
+
+        return response()->json(["board" => $this->game->board->board]);
     }
 
-    /**
-     * 
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $gameId
-     * @return \Illuminate\Http\Response
-     */
-    public function move(Request $request, $gameId)
-    {
-        //
-    }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
+    public function setFlag(Request $request, $gameId)
     {
-        //
+        
+        // TODO VALIDATION
+
+        $x = $request->get('x');
+        $y = $request->get('y');
+
+        $this->game->set($gameId);
+
+        $this->game->play($x, $y, MoveType::fromValue(MoveType::Flag));
+
+        return response()->json(["gameId" => $this->game->id, "board" => $this->game->board->board]);
     }
 }
