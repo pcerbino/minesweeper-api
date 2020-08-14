@@ -17,9 +17,9 @@ class CreateGamesTable extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->string('status');
-            $table->dateTime('started_at');
-            $table->json('board');
-            $table->integer('q_lines');
+            $table->dateTime('started_at')->nullable();
+            $table->longtext('board');
+            $table->integer('q_cols');
             $table->integer('q_rows');
             $table->integer('q_mines');
             $table->timestamps();

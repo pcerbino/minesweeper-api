@@ -17,14 +17,8 @@ class Position {
      */
     public $y;
 
-    /**
-     * Mine
-     *
-     * @var int
-     */
-    public $y;
     
-    public function set(integer $x, integer $i){
+    public function __construct(int $x, int $y){
         $this->x = $x;
         $this->y = $y;
     }
