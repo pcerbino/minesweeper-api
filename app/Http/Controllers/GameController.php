@@ -6,7 +6,6 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\Controller;
-
 use App\Game\Game;
 use App\Enums\MoveType;
 use App\Http\Requests\GameCreateRequest;
@@ -24,7 +23,6 @@ class GameController extends Controller
         $this->game = $game;
     }
 
-
     public function create(GameCreateRequest $request)
     {
 
@@ -38,7 +36,6 @@ class GameController extends Controller
 
         return response()->json(["gameId" => $this->game->id, "board" => $this->game->board->board]);
     }
-
 
     public function setSquare(SetSquareRequest $request, $gameId)
     {

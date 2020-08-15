@@ -23,4 +23,3 @@ Route::middleware('auth:api')->group(function () {
 	Route::put('game/{gameId}/setSquare', 'GameController@setSquare');
 	Route::put('game/{gameId}/setFlag', 'GameController@setFlag');
 });
-

@@ -24,6 +24,7 @@ class Board {
         $this->cols = $cols;
         $this->rows = $rows;
 
+
     }
 
     public function create(int $rows = 10, int $cols = 10, int $mines) {
@@ -35,6 +36,7 @@ class Board {
         // Make array with empty values
         for($i = 0; $i < $rows; $i++){
             for($j=0; $j<$cols; $j++){
+
                 $this->board[$i][$j] = new Square($j, $i, SquareContentType::fromValue(SquareContentType::Empty), SquareStatusType::fromValue(SquareStatusType::Hidden) );
             }
         }
@@ -43,6 +45,7 @@ class Board {
         for($i=0; $i<$mines; $i++){
             $element = $this->_setRandomMine($this->board);
             $this->board[$element->y][$element->x] = $element;
+
         }
 
         // Mark surrounded squares with numbers 
