@@ -119,7 +119,16 @@ class Game {
 
             $this->board->putFlag($position);
             $this->save();
-        }        
+        }
+
+        if($moveType->is('show')){
+            ;
+            $position = new Position($x, $y);
+
+            $this->board->displaySquare($position);
+            $this->save();
+        }
+
 
             // QUESTION MARK
                 // Board > putQuestionMark
@@ -128,11 +137,6 @@ class Game {
                 // Board > display
                     // Result == Bomb
                         // Finish game
-
-        
-        // Update DB record
-        // Set MoveResult 
-        // Return MoveResult
 
         return true;
     }

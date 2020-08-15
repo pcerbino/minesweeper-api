@@ -2,10 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
+
 use Illuminate\Http\Request;
-use App\Enums\MoveType;
+use Illuminate\Support\Facades\Validator;
+use App\Http\Controllers\Controller;
+
 use App\Game\Game;
+use App\Enums\MoveType;
+use App\Http\Requests\GameCreateRequest;
+use App\Http\Requests\SetSquareRequest;
+use App\Http\Requests\SetFlagRequest;
 
 class GameController extends Controller
 {
@@ -19,22 +25,25 @@ class GameController extends Controller
     }
 
 
-    public function create(Request $request)
+    public function create(GameCreateRequest $request)
     {
 
-        // TODO VALIDATION
+        $validated = $request->validated();
 
-        $this->game->start(15, 15, 15);
+        $rows = $request->get('rows');
+        $cols = $request->get('cols');
+        $mines = $request->get('mines');
+
+        $this->game->start($rows, $cols, $mines);
 
         return response()->json(["gameId" => $this->game->id, "board" => $this->game->board->board]);
     }
 
 
-    public function setSquare(Request $request, $gameId)
+    public function setSquare(SetSquareRequest $request, $gameId)
     {
-        // TODO VALIDATION
 
-        // TODO VALIDATION
+        $validated = $request->validated();
 
         $x = $request->get('x');
         $y = $request->get('y');
@@ -47,10 +56,8 @@ class GameController extends Controller
     }
 
 
-    public function setFlag(Request $request, $gameId)
+    public function setFlag(SetFlagRequest $request, $gameId)
     {
-        
-        // TODO VALIDATION
 
         $x = $request->get('x');
         $y = $request->get('y');
@@ -61,4 +68,5 @@ class GameController extends Controller
 
         return response()->json(["gameId" => $this->game->id, "board" => $this->game->board->board]);
     }
+
 }
