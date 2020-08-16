@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
  
 use App\User;
+use App\Game;
 use Illuminate\Http\Request;
  
 class PassportController extends Controller
@@ -60,6 +61,16 @@ class PassportController extends Controller
      */
     public function details()
     {
-        return response()->json(['user' => auth()->user()], 200);
+
+        $qGames = Game::where('user_id', auth()->user()->id)->where('status', '<>', 'new')->count();
+
+        $qGamesLoosed = Game::where('user_id', auth()->user()->id)->where('status', 'loosed')->count();
+        $qGamesWinned = Game::where('user_id', auth()->user()->id)->where('status', 'winned')->count();
+        $qGamesInProgress = Game::where('user_id', auth()->user()->id)->where('status', 'in_progress')->count();
+        $lastGame = Game::where('user_id', auth()->user()->id)->latest('id')->first();
+        $qGamesAbandoned = Game::where('user_id', auth()->user()->id)->whereIn('status', ['in_progress'])->where('id', '<', $lastGame->id)->count();
+        $qGamesInProgress = Game::where('user_id', auth()->user()->id)->whereIn('status', ['in_progress'])->where('id', $lastGame->id)->count();
+
+        return response()->json(['user' => auth()->user(), 'stats' => ['played' => $qGames, 'loosed' => $qGamesLoosed, 'winned' => $qGamesWinned, 'abandoned' => $qGamesAbandoned, 'inProgress' => $qGamesInProgress]], 200);
     }
 }

@@ -3,6 +3,7 @@ namespace App\Game;
 
 use App\Enums\MoveType;
 use App\Enums\GameStatusType;
+use App\Enums\SquareContentType;
 use App\Game\Board;
 use App\Game\   Position;
 use App\Game as GameModel;
@@ -48,13 +49,25 @@ class Game {
     public $startedAt;
 
     /**
-     * Game ended at
+     * Game Model
+     * 
+     * @var Game Model
+     */
+    public $model;
+
+    /**
+     * Game ended at time 
      * 
      * @var DateTime
      */
     public $endedAt;
 
-    public $model;
+    /**
+     * Moves realized on game 
+     * 
+     * @var int
+     */
+    public $moves;
 
 
     public function __construct(Board $board, GameModel $model){
@@ -73,6 +86,9 @@ class Game {
         $this->board->rows = $game->q_rows;
         $this->board->cols = $game->q_cols;
         $this->board->mines = $game->q_mines;
+        $this->moves = $game->moves;
+        $this->startedAt = $game->started_at;
+        $this->status = GameStatusType::fromValue($game->status);
     }
 
 
@@ -100,47 +116,55 @@ class Game {
     }
 
     public function save(){
+
         $game = $this->model->find($this->id);
         $game->board = json_encode($this->board->board);
+        $game->status = $this->status;
+        $game->ended_at = $this->endedAt ?? null;
+        $game->started_at = $this->startedAt ?? null;
+        $game->moves = $this->moves;
         $game->save();
     }
 
-    public function play(int $x, int $y, MoveType $moveType) {
+    public function play(int $x, int $y, MoveType $moveType) : GameStatusType {
 
-        // Check game status
-
-        // CASE MoveType
-            // FLAG
-                // Board > putFlag
-
+        $this->setStartProps();
+        $this->moves++;
+        
+        $position = new Position($x, $y);
+        
         if($moveType->is('flag')){
-            
-            $position = new Position($x, $y);
-
-            $this->board->putFlag($position);
-            $this->save();
+            $square_content = $this->board->putFlag($position);
         }
 
         if($moveType->is('show')){
-            ;
-            $position = new Position($x, $y);
-
-            $this->board->displaySquare($position);
-            $this->save();
+            $square_content = $this->board->displaySquare($position);
         }
 
+        if($square_content->value == SquareContentType::fromValue(SquareContentType::Death) ){
+            $this->loose();
+        }
 
-            // QUESTION MARK
-                // Board > putQuestionMark
+        $this->save();
 
-            // Display
-                // Board > display
-                    // Result == Bomb
-                        // Finish game
-
-
-        return true;
+        return $this->status;
     }
 
+    protected function setStartProps(){
+        
+        if($this->startedAt === null){
+            $this->status = GameStatusType::fromValue(GameStatusType::InProgress);
+            $this->startedAt = now();
+        }
+
+        return $this->startedAt;
+    }
+
+
+    protected function loose(){
+
+        $this->status = GameStatusType::fromValue(GameStatusType::Loosed);
+        $this->endedAt = now();
+    }
 
 }

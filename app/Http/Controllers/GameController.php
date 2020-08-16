@@ -47,9 +47,9 @@ class GameController extends Controller
 
         $this->game->set($gameId);
 
-        $this->game->play($x, $y, MoveType::fromValue(MoveType::Show));
+        $status = $this->game->play($x, $y, MoveType::fromValue(MoveType::Show));
 
-        return response()->json(["board" => $this->game->board->board]);
+        return response()->json(["gameId" => $this->game->id, "board" => $this->game->board->board, "status" => $status->value]);
     }
 
 

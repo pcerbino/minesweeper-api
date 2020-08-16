@@ -23,8 +23,6 @@ class Board {
         $this->board = (array) $board;
         $this->cols = $cols;
         $this->rows = $rows;
-
-
     }
 
     public function create(int $rows = 10, int $cols = 10, int $mines) {
@@ -66,39 +64,47 @@ class Board {
                 $board[$i][$j] = $this->board[$j][$i]->getData();
             }
         }
-
         return $board;
     }
 
-    public function putFlag(Position $position){
+    public function putFlag(Position $position) : SquareContentType {
 
         // Check if position is valid on the board
 
         // Check if position == hidden
 
         // Mark flag on position
-        $this->board[$position->y][$position->x]->content = SquareContentType::fromValue(SquareContentType::Flag);
-        $this->board[$position->y][$position->x]->status = SquareStatusType::fromValue(SquareStatusType::Visible);
+
+        if($this->board[$position->y][$position->x]->content->value == SquareContentType::fromValue(SquareContentType::Flag)){
+            $this->board[$position->y][$position->x]->content = SquareContentType::fromValue(SquareContentType::Empty);
+            $this->board[$position->y][$position->x]->status = SquareStatusType::fromValue(SquareStatusType::Hidden);
+        }
+        else{
+            $this->board[$position->y][$position->x]->content = SquareContentType::fromValue(SquareContentType::Flag);
+            $this->board[$position->y][$position->x]->status = SquareStatusType::fromValue(SquareStatusType::Visible);
+        }
+
+        return $this->board[$position->y][$position->x]->content;
     }
 
-    public function displaySquare(Position $position){
+    public function displaySquare(Position $position) {
 
         // TODO: Check if position is valid on the board
 
         // TODO: Check if position == hidden(cover)
 
-        // Check if MINE in position
-        if($this->board[$position->y][$position->x]->content->value == SquareContentType::fromValue(SquareContentType::Mine)){
-            $this->_setAllSquaresVisible();
-        }
-            // return SquareContentType.MINE
+        $this->board[$position->y][$position->x]->status = SquareStatusType::fromValue(SquareStatusType::Visible);
 
-        // Check if EMPTY
-        if($this->board[$position->y][$position->x]->content->value == SquareContentType::fromValue(SquareContentType::Empty)){
+        if($this->board[$position->y][$position->x]->content->value == SquareContentType::fromValue(SquareContentType::Mine)){
+            
+            $this->board[$position->y][$position->x]->content = SquareContentType::fromValue(SquareContentType::Death);
+            $this->_setAllSquaresVisible();
+
+        }else if($this->board[$position->y][$position->x]->content->value == SquareContentType::fromValue(SquareContentType::Empty)){
             $this->_setSurroundedSquaresVisible($position);
         }
 
-        $this->board[$position->y][$position->x]->status = SquareStatusType::fromValue(SquareStatusType::Visible);
+        return $this->board[$position->y][$position->x]->content;
     }
 
 
@@ -133,64 +139,26 @@ class Board {
         }
     }
 
-
     protected function _fillMinesSourranded(){
 
         for($y=0; $y < $this->rows; $y++){
 
             for($x=0; $x < $this->cols; $x++){
 
-                 if($this->board[$y][$x]->content->is("mine")){
+                if($this->board[$y][$x]->content->is("mine")){
 
-                    // left
-                    $xx = $x -1; 
-                    $yy = $y;
-                    if($this->_isValidPosition($xx, $yy) && !$this->board[$yy][$xx]->content->is(SquareContentType::Mine))
-                        $this->_sumNumber($this->board[$yy][$xx]);
+                    $position = new Position($x, $y);
 
-                    // top left
-                    $xx = $x -1; 
-                    $yy = $y -1;
-                    if($this->_isValidPosition($xx, $yy) && !$this->board[$yy][$xx]->content->is(SquareContentType::Mine))
-                        $this->_sumNumber($this->board[$yy][$xx]);
+                    $positions = [[$x -1, $y], [$x -1, $y-1], [$x, $y -1], [$x +1, $y -1], [$x +1, $y], [$x +1, $y+1], [$x, $y +1], [$x -1, $y +1 ] ];
 
-                    // top
-                    $xx = $x; 
-                    $yy = $y -1;
-                    if($this->_isValidPosition($xx, $yy) && !$this->board[$yy][$xx]->content->is(SquareContentType::Mine))
-                        $this->_sumNumber($this->board[$yy][$xx]);
+                    foreach ($positions as $pos) {
+                        $xx = $pos[0]; 
+                        $yy = $pos[1];
 
-                    // top right
-                    $xx = $x +1; 
-                    $yy = $y -1;
-                    if($this->_isValidPosition($xx, $yy) && !$this->board[$yy][$xx]->content->is(SquareContentType::Mine))
-                        $this->_sumNumber($this->board[$yy][$xx]);
-
-                    // right
-                    $xx = $x + 1; 
-                    $yy = $y;
-                    if($this->_isValidPosition($xx, $yy) && !$this->board[$yy][$xx]->content->is(SquareContentType::Mine))
-                        $this->_sumNumber($this->board[$yy][$xx]);
-
-                    // bottom right
-                    $xx = $x +1; 
-                    $yy = $y +1;
-                    if($this->_isValidPosition($xx, $yy) && !$this->board[$yy][$xx]->content->is(SquareContentType::Mine))
-                        $this->_sumNumber($this->board[$yy][$xx]);
-
-                    // bottom
-                    $xx = $x; 
-                    $yy = $y +1;
-                    if($this->_isValidPosition($xx, $yy) && !$this->board[$yy][$xx]->content->is(SquareContentType::Mine))
-                        $this->_sumNumber($this->board[$yy][$xx]);
-
-                    // left bottom
-                    $xx = $x -1; 
-                    $yy = $y +1;
-                    if($this->_isValidPosition($xx, $yy) && !$this->board[$yy][$xx]->content->is(SquareContentType::Mine))
-                        $this->_sumNumber($this->board[$yy][$xx]);
-
-                 }
+                        if($this->_isValidPosition($xx, $yy) && !$this->board[$yy][$xx]->content->is(SquareContentType::Mine))
+                            $this->_sumNumber($this->board[$yy][$xx]);
+                    }
+                }
             }
         }
 

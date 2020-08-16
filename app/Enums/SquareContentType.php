@@ -10,4 +10,5 @@ final class SquareContentType extends Enum
     const Number =  'number';
     const Empty =  'empty';
     const Flag =  'flag';
+    const Death =  'death';
 }

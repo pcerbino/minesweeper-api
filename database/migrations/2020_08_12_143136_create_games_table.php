@@ -22,6 +22,8 @@ class CreateGamesTable extends Migration
             $table->integer('q_cols');
             $table->integer('q_rows');
             $table->integer('q_mines');
+            $table->integer('moves')->nullable();
+            $table->dateTime('ended_at')->nullable();
             $table->timestamps();
         });
     }

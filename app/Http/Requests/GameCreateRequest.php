@@ -26,7 +26,7 @@ class GameCreateRequest extends FormRequest
         return [
             'rows' => 'required|integer|max:50',
             'cols' => 'required|integer|max:50',
-            'mines' => 'required|integer|max:50'
+            'mines' => 'required|integer|max:100'
         ];
     }
 }
