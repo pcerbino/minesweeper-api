@@ -1,6 +1,6 @@
 # Minesweeper API
--------
-Minesweepr classic game API developed in Laravel.
+
+Minesweepr classic game API developed using Laravel.
 
 #### Install instructions
 
@@ -28,4 +28,4 @@ API routes are secured with **Passport** to implement JWT.
 
 #### License
 MIT
-**Free Software, Hell Yeah!**
+
