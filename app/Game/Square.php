@@ -57,7 +57,7 @@ class Square {
 
     public function sumNumber(){
         $this->content = SquareContentType::fromValue(SquareContentType::Number);
-        $this->number++;
+        return $this->number++;
     }
 
     public function _returnHiddenData() : array {

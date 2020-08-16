@@ -68,9 +68,14 @@ class PassportController extends Controller
         $qGamesWinned = Game::where('user_id', auth()->user()->id)->where('status', 'winned')->count();
         $qGamesInProgress = Game::where('user_id', auth()->user()->id)->where('status', 'in_progress')->count();
         $lastGame = Game::where('user_id', auth()->user()->id)->latest('id')->first();
-        $qGamesAbandoned = Game::where('user_id', auth()->user()->id)->whereIn('status', ['in_progress'])->where('id', '<', $lastGame->id)->count();
-        $qGamesInProgress = Game::where('user_id', auth()->user()->id)->whereIn('status', ['in_progress'])->where('id', $lastGame->id)->count();
-
+        $qGamesAbandoned = 0;
+        $qGamesInProgress = 0;
+        
+        if(!empty($lastGame)){
+            $qGamesAbandoned = Game::where('user_id', auth()->user()->id)->whereIn('status', ['in_progress'])->where('id', '<', $lastGame->id)->count();
+            $qGamesInProgress = Game::where('user_id', auth()->user()->id)->whereIn('status', ['in_progress'])->where('id', $lastGame->id)->count();    
+        }
+    
         return response()->json(['user' => auth()->user(), 'stats' => ['played' => $qGames, 'loosed' => $qGamesLoosed, 'winned' => $qGamesWinned, 'abandoned' => $qGamesAbandoned, 'inProgress' => $qGamesInProgress]], 200);
     }
 }

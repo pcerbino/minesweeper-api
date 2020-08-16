@@ -11,6 +11,7 @@ class Board {
     public int $rows = 0;
     public int $cols = 0;
     public int $mines = 0;
+    public int $indicators = 0;
 
     public function __construct($board = null){
         
@@ -19,61 +20,51 @@ class Board {
         }
     }
 
+    /**
+     * Set initial data for board
+     *
+     */
     public function set($board, $rows, $cols){
         $this->board = (array) $board;
         $this->cols = $cols;
         $this->rows = $rows;
     }
 
+    /**
+     * Create start board with mines, and numbers indicators
+     *
+     * @return Board
+     */
     public function create(int $rows = 10, int $cols = 10, int $mines) {
 
         $this->cols = $cols;
         $this->rows = $rows;
         $this->mines = $mines;
 
-        // Make array with empty values
         for($i = 0; $i < $rows; $i++){
             for($j=0; $j<$cols; $j++){
 
                 $this->board[$i][$j] = new Square($j, $i, SquareContentType::fromValue(SquareContentType::Empty), SquareStatusType::fromValue(SquareStatusType::Hidden) );
             }
         }
-        
-        // Generate mines in random positions
+
         for($i=0; $i<$mines; $i++){
             $element = $this->_setRandomMine($this->board);
             $this->board[$element->y][$element->x] = $element;
 
         }
 
-        // Mark surrounded squares with numbers 
-        $this->_fillMinesSourranded();
+        $this->indicators = $this->_fillMinesSourranded();
 
-        // Return board
         return $this->board;
     }
 
-
-    public function getWithVisibility(){
-        
-        $board = [];
-
-        // Set all squares hidden
-        for($i=0; $i<count($this->board); $i++){
-            for($j=0; $j<count($this->board[0]); $j++){
-                $board[$i][$j] = $this->board[$j][$i]->getData();
-            }
-        }
-        return $board;
-    }
-
+    /**
+     * Mark square with flag or remove flag from position
+     *
+     * @return SquareContentType
+     */
     public function putFlag(Position $position) : SquareContentType {
-
-        // Check if position is valid on the board
-
-        // Check if position == hidden
-
-        // Mark flag on position
 
         if($this->board[$position->y][$position->x]->content->value == SquareContentType::fromValue(SquareContentType::Flag)){
             $this->board[$position->y][$position->x]->content = SquareContentType::fromValue(SquareContentType::Empty);
@@ -87,18 +78,19 @@ class Board {
         return $this->board[$position->y][$position->x]->content;
     }
 
+    /**
+     * Uncover square
+     *
+     * @return SquareContentType
+     */
     public function displaySquare(Position $position) {
-
-        // TODO: Check if position is valid on the board
-
-        // TODO: Check if position == hidden(cover)
 
         $this->board[$position->y][$position->x]->status = SquareStatusType::fromValue(SquareStatusType::Visible);
 
         if($this->board[$position->y][$position->x]->content->value == SquareContentType::fromValue(SquareContentType::Mine)){
             
             $this->board[$position->y][$position->x]->content = SquareContentType::fromValue(SquareContentType::Death);
-            $this->_setAllSquaresVisible();
+            $this->setAllSquaresVisible();
 
         }else if($this->board[$position->y][$position->x]->content->value == SquareContentType::fromValue(SquareContentType::Empty)){
             $this->_setSurroundedSquaresVisible($position);
@@ -108,7 +100,7 @@ class Board {
     }
 
 
-    protected function _setAllSquaresVisible(){
+    public function setAllSquaresVisible(){
 
         for($y=0; $y < count($this->board); $y++){
             for($x=0; $x < count($this->board[$y]); $x++){
@@ -139,7 +131,14 @@ class Board {
         }
     }
 
+    /**
+     * Complete the squares that sourrand mines with number indicators
+     *
+     * @return int
+     */
     protected function _fillMinesSourranded(){
+
+        $indicatorsCounter = 0;
 
         for($y=0; $y < $this->rows; $y++){
 
@@ -155,25 +154,63 @@ class Board {
                         $xx = $pos[0]; 
                         $yy = $pos[1];
 
-                        if($this->_isValidPosition($xx, $yy) && !$this->board[$yy][$xx]->content->is(SquareContentType::Mine))
-                            $this->_sumNumber($this->board[$yy][$xx]);
+                        if($this->_isValidPosition($xx, $yy) && !$this->board[$yy][$xx]->content->is(SquareContentType::Mine)){
+                            $q = $this->_sumNumber($this->board[$yy][$xx]);
+
+                            if($q == 1) $indicatorsCounter++;
+                        }
                     }
                 }
             }
         }
 
+        return $indicatorsCounter;
     }
 
+    /**
+     * Count visible squares..
+     *
+     * @return boolean
+     */
+    public function getVisibleSquares(){
+        
+        $i=0;
+        for($y=0; $y < $this->rows; $y++){
+
+            for($x=0; $x < $this->cols; $x++){
+
+                if($this->board[$y][$x]->status->value == SquareStatusType::fromValue(SquareStatusType::Visible) 
+                    && $this->board[$y][$x]->content->value != SquareContentType::fromValue(SquareContentType::Flag) ){
+                    $i++;
+                }
+
+
+            }
+        }
+
+        return $i;
+    }
+
+    /**
+     * Check if position is valid on board
+     *
+     * @return boolean
+     */
     protected function  _isValidPosition($x, $y) : bool {
 
         return ($x >= 0 && $x <= ($this->cols -1) && $y >= 0 && $y <= ($this->rows -1));
     }
 
-    protected function _sumNumber(Square $square) : Square {
+    /**
+     * Increase the number indicator of mine sourranded
+     *
+     * @return int
+     */
+    protected function _sumNumber(Square $square) : int {
 
-        $square->sumNumber();
+        $q = $square->sumNumber();
 
-        return $square;
+        return $q;
     }
 
     /*

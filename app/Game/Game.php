@@ -76,34 +76,43 @@ class Game {
         $this->model = $model;
     }
 
+    /**
+     * Handles Login Request
+     *
+     * @param Integer $id
+     */
     public function set(int $id){
 
         $game = $this->model->find($id);
 
         $this->id   = $game->id;
-
         $this->board->board = json_decode($game->board);
         $this->board->rows = $game->q_rows;
         $this->board->cols = $game->q_cols;
         $this->board->mines = $game->q_mines;
+
         $this->moves = $game->moves;
         $this->startedAt = $game->started_at;
         $this->status = GameStatusType::fromValue($game->status);
     }
 
-
+    /**
+     * Start game
+     *
+     * @param rows quantity $rows
+     * @param cols quantity $cols
+     * @param mines quantity $mines
+     *
+     * @return GameStatusType
+     */
     public function start(int $rows, int $cols, int $mines) {
 
-        // Create new board with size and mines
         $this->board->create($rows, $cols, $mines);
-
-        // Set NEW status
         $this->status = GameStatusType::fromValue(GameStatusType::New);
 
-        // Create new record on DB
         $game = new $this->model;
         $game->board = json_encode($this->board->board);
-        $game->user_id = 1;
+        $game->user_id = auth()->user()->id;
         $game->status = $this->status;
         $game->q_rows = $this->board->rows;
         $game->q_cols = $this->board->cols;
@@ -112,9 +121,14 @@ class Game {
 
         $this->id = $game->id;
 
-        return true;
+        return $this->status;
     }
 
+    /**
+     * Save game
+     *
+     * @return GameStatusType
+     */
     public function save(){
 
         $game = $this->model->find($this->id);
@@ -124,11 +138,21 @@ class Game {
         $game->started_at = $this->startedAt ?? null;
         $game->moves = $this->moves;
         $game->save();
+
+        return $this->status;
     }
 
+    /**
+     * Play game
+     *
+     * @param x position on board $x
+     * @param y position on board $y
+     * @param MoveType
+     * @return GameStatusType
+     */
     public function play(int $x, int $y, MoveType $moveType) : GameStatusType {
 
-        $this->setStartProps();
+        $this->setStartProperties();
         $this->moves++;
         
         $position = new Position($x, $y);
@@ -138,11 +162,18 @@ class Game {
         }
 
         if($moveType->is('show')){
+            
             $square_content = $this->board->displaySquare($position);
+            
+            if($square_content->value == SquareContentType::fromValue(SquareContentType::Death) ){
+
+                $this->loose();
+            }
         }
 
-        if($square_content->value == SquareContentType::fromValue(SquareContentType::Death) ){
-            $this->loose();
+        if($this->board->getVisibleSquares() == (($this->board->cols * $this->board->rows) - $this->board->mines)){
+            $this->board->setAllSquaresVisible();
+            $this->win();   
         }
 
         $this->save();
@@ -150,7 +181,7 @@ class Game {
         return $this->status;
     }
 
-    protected function setStartProps(){
+    protected function setStartProperties(){
         
         if($this->startedAt === null){
             $this->status = GameStatusType::fromValue(GameStatusType::InProgress);
@@ -164,6 +195,12 @@ class Game {
     protected function loose(){
 
         $this->status = GameStatusType::fromValue(GameStatusType::Loosed);
+        $this->endedAt = now();
+    }
+
+    protected function win(){
+
+        $this->status = GameStatusType::fromValue(GameStatusType::Winned);
         $this->endedAt = now();
     }
 
