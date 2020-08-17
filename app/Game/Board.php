@@ -12,6 +12,7 @@ class Board {
     public int $cols = 0;
     public int $mines = 0;
     public int $indicators = 0;
+    public array $affectedSquares = [];
 
     public function __construct($board = null){
         
@@ -75,6 +76,8 @@ class Board {
             $this->board[$position->y][$position->x]->status = SquareStatusType::fromValue(SquareStatusType::Visible);
         }
 
+        $this->affectedSquares[] = $this->board[$position->y][$position->x];
+
         return $this->board[$position->y][$position->x]->content;
     }
 
@@ -86,13 +89,16 @@ class Board {
     public function displaySquare(Position $position) {
 
         $this->board[$position->y][$position->x]->status = SquareStatusType::fromValue(SquareStatusType::Visible);
+        $this->affectedSquares[] = $this->board[$position->y][$position->x];
 
         if($this->board[$position->y][$position->x]->content->value == SquareContentType::fromValue(SquareContentType::Mine)){
             
             $this->board[$position->y][$position->x]->content = SquareContentType::fromValue(SquareContentType::Death);
             $this->setAllSquaresVisible();
 
+
         }else if($this->board[$position->y][$position->x]->content->value == SquareContentType::fromValue(SquareContentType::Empty)){
+            
             $this->_setSurroundedSquaresVisible($position);
         }
 
@@ -106,6 +112,7 @@ class Board {
             for($x=0; $x < count($this->board[$y]); $x++){
 
                 $this->board[$y][$x]->status = SquareStatusType::fromValue(SquareStatusType::Visible);
+                $this->affectedSquares[] = $this->board[$y][$x];
             }
         }
     }
@@ -118,15 +125,20 @@ class Board {
 
             $x = $pos[0]; 
             $y = $pos[1];
-            
+
             if( $this->_isValidPosition($x, $y) 
                 && ($this->board[$y][$x]->content->value == SquareContentType::fromValue(SquareContentType::Empty) || $this->board[$y][$x]->content->value == SquareContentType::fromValue(SquareContentType::Number))
-                && $this->board[$y][$x]->status->value == SquareStatusType::fromValue(SquareStatusType::Hidden))
+                && $this->board[$y][$x]->status->value == SquareStatusType::fromValue(SquareStatusType::Hidden)
+            )
             {
+                
                 $this->board[$y][$x]->status = SquareStatusType::fromValue(SquareStatusType::Visible);
+                $this->affectedSquares[] = $this->board[$y][$x];
+                
                 $nextPosition = new Position($x, $y);
-                if($this->board[$y][$x]->content->value == SquareContentType::fromValue(SquareContentType::Empty))
-                $this->_setSurroundedSquaresVisible($nextPosition);
+                if($this->board[$y][$x]->content->value == SquareContentType::fromValue(SquareContentType::Empty)){
+                    $this->_setSurroundedSquaresVisible($nextPosition);
+                }
             }            
         }
     }

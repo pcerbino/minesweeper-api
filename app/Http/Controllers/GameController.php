@@ -49,7 +49,7 @@ class GameController extends Controller
 
         $status = $this->game->play($x, $y, MoveType::fromValue(MoveType::Show));
 
-        return response()->json(["gameId" => $this->game->id, "status" => $status->value, "board" => $this->game->board->board]);
+        return response()->json(["gameId" => $this->game->id, "status" => $status->value, "affectedSquares" => $this->game->board->affectedSquares]);
     }
 
 
@@ -63,7 +63,7 @@ class GameController extends Controller
 
         $status = $this->game->play($x, $y, MoveType::fromValue(MoveType::Flag));
 
-        return response()->json(["gameId" => $this->game->id, "status" => $status->value, "board" => $this->game->board->board]);
+        return response()->json(["gameId" => $this->game->id, "status" => $status->value, "affectedSquares" => $this->game->board->affectedSquares]);
     }
 
 }
