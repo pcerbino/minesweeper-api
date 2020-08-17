@@ -65,15 +65,15 @@ class Board {
      *
      * @return SquareContentType
      */
-    public function putFlag(Position $position) : SquareContentType {
+    public function putFlag(Position $position) {
 
-        if($this->board[$position->y][$position->x]->content->value == SquareContentType::fromValue(SquareContentType::Flag)){
-            $this->board[$position->y][$position->x]->content = SquareContentType::fromValue(SquareContentType::Empty);
+        if($this->board[$position->y][$position->x]->status->value == SquareStatusType::fromValue(SquareStatusType::Flag)){
+
             $this->board[$position->y][$position->x]->status = SquareStatusType::fromValue(SquareStatusType::Hidden);
-        }
-        else{
-            $this->board[$position->y][$position->x]->content = SquareContentType::fromValue(SquareContentType::Flag);
-            $this->board[$position->y][$position->x]->status = SquareStatusType::fromValue(SquareStatusType::Visible);
+        
+        }else{
+
+            $this->board[$position->y][$position->x]->status = SquareStatusType::fromValue(SquareStatusType::Flag);
         }
 
         $this->affectedSquares[] = $this->board[$position->y][$position->x];
@@ -191,12 +191,9 @@ class Board {
 
             for($x=0; $x < $this->cols; $x++){
 
-                if($this->board[$y][$x]->status->value == SquareStatusType::fromValue(SquareStatusType::Visible) 
-                    && $this->board[$y][$x]->content->value != SquareContentType::fromValue(SquareContentType::Flag) ){
+                if($this->board[$y][$x]->status->value == SquareStatusType::fromValue(SquareStatusType::Visible) ){
                     $i++;
                 }
-
-
             }
         }
 

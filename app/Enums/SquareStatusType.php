@@ -8,4 +8,5 @@ final class SquareStatusType extends Enum
 {
     const Visible =  'visible';
     const Hidden =  'hidden';
+    const Flag =  'flag';
 }

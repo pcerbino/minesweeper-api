@@ -9,6 +9,5 @@ final class SquareContentType extends Enum
     const Mine =  'mine';
     const Number =  'number';
     const Empty =  'empty';
-    const Flag =  'flag';
     const Death =  'death';
 }
