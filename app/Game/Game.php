@@ -5,7 +5,7 @@ use App\Enums\MoveType;
 use App\Enums\GameStatusType;
 use App\Enums\SquareContentType;
 use App\Game\Board;
-use App\Game\   Position;
+use App\Game\Position;
 use App\Game as GameModel;
 
 class Game {

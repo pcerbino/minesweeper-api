@@ -21,10 +21,12 @@ The API it's focused on resolve and deliver to client all the information clean 
 
 API routes are secured with **Passport** to implement JWT.
 
+There are Feature Tests for game start and display square actions.
+
 #### Todos
 
 - Implement Exceptions to handle errors.
-- Develop testing
+- Tests for user registration and login
 
 #### License
 MIT
